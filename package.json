@@ -1,0 +1,22 @@
+{
+  "name": "newman-reporter-tesults",
+  "version": "1.0.0",
+  "description": "Newman reporter for submitting results to Tesults",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "newman",
+    "postman",
+    "reporter",
+    "tesults",
+    "test",
+    "reporting"
+  ],
+  "author": "Tesults",
+  "license": "MIT",
+  "dependencies": {
+    "tesults": "^1.1.3"
+  }
+}
