@@ -45,6 +45,27 @@ module.exports = function (emitter, reporterOptions, collectionRunOptions) {
             }
         }
 
+        // Build information
+        const buildName = reporterOptions["buildName"]
+        const buildDescription = reporterOptions["buildDescription"]
+        const buildResult = reporterOptions["buildResult"]
+        const buildReason = reporterOptions["buildReason"]
+        if (buildName !== undefined) {
+            let buildCase = {suite: "[build]", name: buildName, result: "unknown"}
+            if (buildResult !== undefined) {
+                if (buildResult === "pass" || buildResult === "fail") {
+                    buildCase.result = buildResult
+                }
+            }
+            if (buildDescription !== undefined) {
+                buildCase.desc = buildDescription
+            }
+            if (buildReason !== undefined) {
+                buildCase.reason = buildReason
+            }
+            data_submit.results.cases.push(buildCase)
+        }
+        
         const caseHash = {}
         // Get assertions/ test case details
         if (data.run !== undefined) {
