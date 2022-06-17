@@ -77,18 +77,20 @@ module.exports = function (emitter, reporterOptions, collectionRunOptions) {
                         name: execution.item.name,
                         result: "pass"
                     }
-                    for (let j = 0; j < execution.assertions.length; j++) {
-                        let assertion = execution.assertions[j]
-                        if (assertion.error !== undefined) {
-                            testCase.result = "fail"
-                            if (testCase.reason === undefined) {
-                                testCase.reason = [assertion.error]
-                            } else {
-                                testCase.reason.push(assertion.error)
+                    if (execution.assertions !== undefined) {
+                        for (let j = 0; j < execution.assertions.length; j++) {
+                            let assertion = execution.assertions[j]
+                            if (assertion.error !== undefined) {
+                                testCase.result = "fail"
+                                if (testCase.reason === undefined) {
+                                    testCase.reason = [assertion.error]
+                                } else {
+                                    testCase.reason.push(assertion.error)
+                                }
                             }
-                        }
-                        if (assertion.skipped === true) {
-                            testCase.result = "unknown"
+                            if (assertion.skipped === true) {
+                                testCase.result = "unknown"
+                            }
                         }
                     }
                     try {
