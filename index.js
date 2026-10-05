@@ -1,10 +1,18 @@
 // Reference https://learning.postman.com/docs/running-collections/using-newman-cli/newman-custom-reporters/
 const tesults = require('tesults')
+const fs = require('fs')
+const path = require('path')
+const packageVersion = require('./package.json').version
 
-module.exports = function (emitter, reporterOptions, collectionRunOptions) {
+module.exports = function (emitter, reporterOptions = {}, collectionRunOptions) {
     // emitter is an event emitter that triggers the following events: https://github.com/postmanlabs/newman#newmanrunevents
     // reporterOptions is an object of the reporter specific options. See usage examples below for more details.
     // collectionRunOptions is an object of all the collection run options: https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter
+
+    const outputFile = typeof process.env.TESULTS_OUTPUT_FILE === 'string'
+        ? process.env.TESULTS_OUTPUT_FILE.trim()
+        : ''
+    const hasTarget = reporterOptions.target !== undefined && reporterOptions.target !== null
 
     let times = {}
 
@@ -33,8 +41,8 @@ module.exports = function (emitter, reporterOptions, collectionRunOptions) {
             return
         }
 
-        if (reporterOptions.target === undefined || reporterOptions.target === null) {
-            console.log("Tesults target is missing from reporter options. Tesults reporter will be disabled and not submit results.")
+        if (!hasTarget && outputFile === '') {
+            console.log("Tesults target is missing from reporter options and TESULTS_OUTPUT_FILE is not set. Tesults reporter will be disabled.")
             return;
         }
 
@@ -42,6 +50,11 @@ module.exports = function (emitter, reporterOptions, collectionRunOptions) {
             target: reporterOptions.target,
             results: {
                 cases: []
+            },
+            metadata: {
+                integration_name: "newman-reporter-tesults",
+                integration_version: packageVersion,
+                test_framework: "newman"
             }
         }
 
@@ -152,15 +165,24 @@ module.exports = function (emitter, reporterOptions, collectionRunOptions) {
             }
         }
         
-        tesults.results(data_submit, (err, response) => {
-            if (err) {
-                console.log('Error: ' + err);
-            } else {
-                console.log('Success: ' + response.success);
-                console.log('Message: ' + response.message);
-                console.log('Warnings: ' + response.warnings.length);
-                console.log('Errors: ' + response.errors.length);
-            }
-        })
+        if (outputFile !== '') {
+            const outputData = Object.assign({}, data_submit, {target: ""})
+            fs.mkdirSync(path.dirname(outputFile), {recursive: true})
+            fs.writeFileSync(outputFile, JSON.stringify(outputData, null, 2))
+            console.log('Tesults results written to ' + outputFile)
+        }
+
+        if (hasTarget) {
+            tesults.results(data_submit, (err, response) => {
+                if (err) {
+                    console.log('Error: ' + err);
+                } else {
+                    console.log('Success: ' + response.success);
+                    console.log('Message: ' + response.message);
+                    console.log('Warnings: ' + response.warnings.length);
+                    console.log('Errors: ' + response.errors.length);
+                }
+            })
+        }
     })
 }

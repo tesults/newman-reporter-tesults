@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node-version: 20
+            newman-version: 5.3.2
+          - node-version: 24
+            newman-version: 6.2.2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - if: matrix.newman-version == '6.2.2'
+        run: npm ci
+      - if: matrix.newman-version != '6.2.2'
+        run: npm ci --omit=dev
+      - if: matrix.newman-version != '6.2.2'
+        run: npm install --no-save newman@${{ matrix.newman-version }}
+      - run: npm test

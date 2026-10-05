@@ -1,10 +1,13 @@
 {
   "name": "newman-reporter-tesults",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Newman reporter for submitting results to Tesults",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js && node integration-test.js"
   },
   "keywords": [
     "newman",
@@ -15,8 +18,17 @@
     "reporting"
   ],
   "author": "Tesults",
+  "contributors": [
+    {
+      "name": "Ajeet Dhaliwal",
+      "email": "ajeet.dhaliwal@tesults.com"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
-    "tesults": "^1.1.3"
+    "tesults": "^1.2.1"
+  },
+  "devDependencies": {
+    "newman": "6.2.2"
   }
 }
