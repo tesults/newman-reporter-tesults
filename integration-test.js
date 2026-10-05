@@ -154,7 +154,8 @@ const run = options => new Promise((resolve, reject) => {
 
         assert.strictEqual(passing.result, 'pass')
         assert.strictEqual(failing.result, 'fail')
-        assert.match(JSON.stringify(failing.reason), /expected response to have status code 404 but got 200/i)
+        assert.strictEqual(typeof failing.reason, 'string')
+        assert.match(failing.reason, /expected response to have status code 404 but got 200/i)
         assert.strictEqual(skipped.result, 'unknown')
         assert.strictEqual(noAssertions.result, 'pass')
         assert.strictEqual(typeof passing.start, 'number')

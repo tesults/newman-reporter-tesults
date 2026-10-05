@@ -4,6 +4,21 @@ const fs = require('fs')
 const path = require('path')
 const packageVersion = require('./package.json').version
 
+const readableReason = (reason) => {
+    if (!Array.isArray(reason)) { return reason }
+
+    return reason.map((error) => {
+        if (typeof error === 'string') { return error }
+        if (error && typeof error.stack === 'string') { return error.stack }
+        if (error && typeof error.message === 'string') { return error.message }
+        try {
+            return JSON.stringify(error)
+        } catch (err) {
+            return String(error)
+        }
+    }).filter(Boolean).join('\n\n')
+}
+
 module.exports = function (emitter, reporterOptions = {}, collectionRunOptions) {
     // emitter is an event emitter that triggers the following events: https://github.com/postmanlabs/newman#newmanrunevents
     // reporterOptions is an object of the reporter specific options. See usage examples below for more details.
@@ -166,7 +181,10 @@ module.exports = function (emitter, reporterOptions = {}, collectionRunOptions) 
         }
         
         if (outputFile !== '') {
-            const outputData = Object.assign({}, data_submit, {target: ""})
+            const outputData = JSON.parse(JSON.stringify(Object.assign({}, data_submit, {target: ""})))
+            outputData.results.cases.forEach((testCase) => {
+                testCase.reason = readableReason(testCase.reason)
+            })
             fs.mkdirSync(path.dirname(outputFile), {recursive: true})
             fs.writeFileSync(outputFile, JSON.stringify(outputData, null, 2))
             console.log('Tesults results written to ' + outputFile)

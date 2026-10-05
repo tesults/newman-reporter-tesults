@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-tesults",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Newman reporter for submitting results to Tesults",
   "main": "index.js",
   "files": [

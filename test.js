@@ -144,6 +144,10 @@ try {
         reason: 'completed'
     })
     assert.strictEqual(outputOnlyData.results.cases.length, 5)
+    assert.strictEqual(
+        outputOnlyData.results.cases.find(testCase => testCase.result === 'fail').reason,
+        'expected 200 to equal 404'
+    )
 
     reset()
     const combinedFile = path.join(temporaryDirectory, 'combined.json')
@@ -152,7 +156,16 @@ try {
 
     assert.strictEqual(uploads.length, 1)
     assert.strictEqual(uploads[0].target, 'combined-token')
-    assert.strictEqual(JSON.parse(fs.readFileSync(combinedFile, 'utf8')).target, '')
+    assert.deepStrictEqual(uploads[0].results.cases.find(testCase => testCase.result === 'fail').reason, [{
+        name: 'AssertionError',
+        message: 'expected 200 to equal 404'
+    }])
+    const combinedData = JSON.parse(fs.readFileSync(combinedFile, 'utf8'))
+    assert.strictEqual(combinedData.target, '')
+    assert.strictEqual(
+        combinedData.results.cases.find(testCase => testCase.result === 'fail').reason,
+        'expected 200 to equal 404'
+    )
 
     reset()
     runReporter({})
